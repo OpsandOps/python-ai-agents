@@ -1,0 +1,154 @@
+
+# ============================================================================
+# EXAMPLE 1: Basic Prompt (no tools)
+# ============================================================================
+prompt_basic = Prompt(
+    messages=[
+        {"role": "system", "content": "You are a helpful AI assistant."},
+        {"role": "user", "content": "What is Python?"},
+        {"role": "assistant", "content": "Python is a high-level programming language..."},
+        {"role": "user", "content": "Tell me more about its history."}
+    ],
+    tools=[]  # No tools needed for this conversation
+)
+
+
+# ============================================================================
+# EXAMPLE 2: Prompt with Function-Calling Tools (Correct Schema Format)
+# ============================================================================
+prompt_with_tools = Prompt(
+    messages=[
+        {
+            "role": "system", 
+            "content": "You are an agent. Pursue these goals in priority order:\n"
+                      "1. Explore Files: Explore files in the current directory\n"
+                      "2. Terminate: End session when complete\n\n"
+                      "Always respond by calling one of the available tools."
+        },
+        {
+            "role": "user", 
+            "content": "List all files in the current directory"
+        }
+    ],
+    tools=[
+        {
+            "type": "function",
+            "function": {
+                "name": "list_files",
+                "description": "Returns a list of files in the current directory.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},  # No parameters needed
+                    "required": []
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "read_file",
+                "description": "Reads the content of a specified file in the directory.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "file_name": {
+                            "type": "string",
+                            "description": "Name of the file to read"
+                        }
+                    },
+                    "required": ["file_name"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "terminate",
+                "description": "Terminates the agent loop with a summary message.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "message": {
+                            "type": "string",
+                            "description": "Final summary message to display"
+                        }
+                    },
+                    "required": ["message"]
+                }
+            }
+        }
+    ]
+)
+
+
+# ============================================================================
+# EXAMPLE 3: Multi-Turn Conversation with Tool Usage History
+# ============================================================================
+prompt_conversation_history = Prompt(
+    messages=[
+        {
+            "role": "system",
+            "content": "You are a file explorer agent. Help users navigate and read files."
+        },
+        {
+            "role": "user",
+            "content": "What files are here?"
+        },
+        {
+            "role": "assistant",
+            "content": '{"tool": "list_files", "args": {}}'
+        },
+        {
+            "role": "user",
+            "content": '{"tool_executed": true, "result": ["test.py", "agent.py", "db.py"]}'
+        },
+        {
+            "role": "user",
+            "content": "Read the content of agent.py"
+        }
+    ],
+    tools=[
+        {
+            "type": "function",
+            "function": {
+                "name": "list_files",
+                "description": "Lists files in current directory",
+                "parameters": {"type": "object", "properties": {}}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "read_file",
+                "description": "Reads a file's contents",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "file_name": {"type": "string"}
+                    },
+                    "required": ["file_name"]
+                }
+            }
+        }
+    ]
+)
+
+
+# ============================================================================
+# Print examples to see the structure
+# ============================================================================
+if __name__ == "__main__":
+    print("=" * 70)
+    print("EXAMPLE 1: Basic Prompt (No Tools)")
+    print("=" * 70)
+    print(f"Number of messages: {len(prompt_basic.messages)}")
+    print(f"Number of tools: {len(prompt_basic.tools)}")
+    print(f"\nFirst message: {prompt_basic.messages[0]}")
+    
+    print("\n" + "=" * 70)
+    print("EXAMPLE 2: Prompt with Function-Calling Tools")
+    print("=" * 70)
+    print(f"Number of messages: {len(prompt_with_tools.messages)}")
+    print(f"Number of tools: {len(prompt_with_tools.tools)}")
+    print(f"\nTool names available: {[t['function']['name'] for t in prompt_with_tools.tools]}")
+    print(f"\nFirst tool schema:\n{prompt_with_tools.tools[0]}")
