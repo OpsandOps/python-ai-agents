@@ -511,9 +511,4 @@ BENEFITS OF DECORATOR PATTERN:
 ✅ Auto-discovery of tools
 ✅ Metadata attached to functions
 ✅ Easy to add/remove tools
-
-TRADE-OFFS:
-⚠️ Global registry (less explicit)
-⚠️ All tools must accept action_context first parameter
-⚠️ Slightly less flexible than Action objects
 """
